@@ -686,6 +686,7 @@ class Router:
         # If we're running inside a starlette application then raise an
         # exception, so that the configurable exception handler can deal with
         # returning the response. For plain ASGI apps, just return the response.
+        print('not found', scope.keys())
         if "app" in scope:
             raise HTTPException(status_code=404)
         else:
@@ -726,10 +727,12 @@ class Router:
         startup and shutdown events.
         """
         started = False
+        print('lifespan', scope.keys())
         app: typing.Any = scope.get("app")
         await receive()
         try:
             async with self.lifespan_context(app) as maybe_state:
+                print('lifespanafter', scope.keys())
                 if maybe_state is not None:
                     if "state" not in scope:
                         raise RuntimeError(
@@ -756,6 +759,7 @@ class Router:
         await self.middleware_stack(scope, receive, send)
 
     async def app(self, scope: Scope, receive: Receive, send: Send) -> None:
+        print('app', scope.keys())
         assert scope["type"] in ("http", "websocket", "lifespan")
 
         if "router" not in scope:
